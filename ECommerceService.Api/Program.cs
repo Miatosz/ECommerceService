@@ -1,10 +1,12 @@
 
 using ECommerceService.Api.Extensions;
+using ECommerceService.Api.Middlewares;
 using ECommerceService.Api.Profiles;
 using ECommerceService.Api.Repositories;
 using ECommerceService.Api.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.OData;
 
 namespace ECommerceService.Api
 {
@@ -16,7 +18,9 @@ namespace ECommerceService.Api
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddOData(opt =>
+                opt.Select().Filter().OrderBy().Expand().SetMaxTop(100)
+                );
 
             builder.Services.AddValidatorsFromAssemblyContaining<CreateProductDtoValidator>();
             builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
@@ -44,7 +48,7 @@ namespace ECommerceService.Api
 
             app.UseAuthorization();
 
-
+            app.UseMiddleware<ExceptionMiddleware>();
             app.MapControllers();
 
             app.Run();

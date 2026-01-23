@@ -18,6 +18,12 @@ namespace ECommerceService.Api.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteAsync(Product product)
+        {
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<Product?> GetByIdAsync(int id)
         {
             return await _context.Products.FindAsync(id);
@@ -26,6 +32,12 @@ namespace ECommerceService.Api.Repositories
         public IQueryable<Product?> Query()
         {
             return _context.Products.AsNoTracking();
+        }
+
+        public async Task UpdateAsync(Product product)
+        {
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
         }
     }
 }

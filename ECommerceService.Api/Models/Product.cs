@@ -9,6 +9,16 @@
         public decimal Price { get; set; }
         public int Stock { get; set; }
 
+
+        public void UpdatePrice(decimal price)
+        {
+            Price = price;
+        }
+
+        public void UpdateStock(int stock) 
+        { 
+            Stock = stock; 
+        }
         
     }
 }

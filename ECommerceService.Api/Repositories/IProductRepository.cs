@@ -7,6 +7,7 @@ namespace ECommerceService.Api.Repositories
         Task<Product?> GetByIdAsync(int id);
         IQueryable<Product?> Query();
         Task AddAsync(Product product);
-
+        Task UpdateAsync(Product product);
+        Task DeleteAsync(Product product);
     }
 }

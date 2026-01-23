@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using ECommerceService.Api.Dto;
 using ECommerceService.Api.Models;
 using ECommerceService.Api.Repositories;
@@ -26,6 +27,23 @@ namespace ECommerceService.Api.Services
             return product.Id;
         }
 
+        public async Task<bool> DeleteProductAsync(int id)
+        {
+            var product = await _repo.GetByIdAsync(id);
+            if (product == null)
+                return false;
+
+            await _repo.DeleteAsync(product);
+            return true;
+        }
+
+        public async Task<List<GetProductDto>> GetAllProductsAsync()
+        {
+            var products = await _repo.Query().ToListAsync();
+
+            return _mapper.Map<List<GetProductDto>>(products);
+        }
+
         public async Task<GetProductDto> GetByIdAsync(int id)
         {
             var product = await _repo.GetByIdAsync(id);
@@ -47,6 +65,28 @@ namespace ECommerceService.Api.Services
             var dict = products.ToDictionary(x => x.Id, x => x.Price);
 
             return dict;
+        }
+
+        public IQueryable<GetProductDto> QueryProducts()
+        {
+            return _repo.Query()
+                .ProjectTo<GetProductDto>(_mapper.ConfigurationProvider);
+        }
+
+        public async Task<GetProductDto> UpdateProduct(UpdateProductDto dto)
+        {
+            var product = await _repo.GetByIdAsync(dto.Id);
+            if (product == null)
+                throw new KeyNotFoundException("Product with given id not found.");
+
+            product.UpdatePrice(dto.Price);
+            product.Name = dto.Name;
+            product.Description = dto.Description;
+            product.Stock = dto.Stock;
+
+            await _repo.UpdateAsync(product);
+
+            return _mapper.Map<GetProductDto>(product);
         }
     }
 }
