@@ -5,8 +5,10 @@ namespace ECommerceService.Api.Services
 {
     public interface IOrderService
     {
-        Task<CreateOrderDto> CreateOrderAsync(CreateOrderDto order);
+        Task<int> CreateOrderAsync(CreateOrderDto dto, int userId);
         Task ChangeOrderStatus(UpdateOrderDto order);
+        public Task CancelOrder(int orderId);
+        public Task SendOrder(int orderId);
 
     }
 }

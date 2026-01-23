@@ -1,4 +1,8 @@
 
+using ECommerceService.Api.Extensions;
+using ECommerceService.Api.Profiles;
+using ECommerceService.Api.Repositories;
+using ECommerceService.Api.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -20,6 +24,10 @@ namespace ECommerceService.Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddApplicationServices();
+
+            builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 
 
 

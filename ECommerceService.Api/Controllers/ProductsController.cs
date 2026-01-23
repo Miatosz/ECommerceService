@@ -1,4 +1,5 @@
 ﻿using ECommerceService.Api.Dto;
+using ECommerceService.Api.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 

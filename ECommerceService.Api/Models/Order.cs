@@ -1,11 +1,18 @@
-﻿namespace ECommerceService.Api.Models
+﻿using ECommerceService.Api.Dto;
+using System.Linq;
+
+namespace ECommerceService.Api.Models
 {
     public class Order
     {
-        public Order()
+        protected Order() { }
+        public static Order Create()
         {
-            OrderDate = DateTime.Now;
-            OrderStatus = Status.Ordered;
+            return new Order
+            {
+                OrderDate = DateTime.UtcNow,
+                OrderStatus = Status.Ordered
+            };
         }
 
         public int Id { get; set; }
@@ -18,7 +25,8 @@
 
         public decimal Total { get; set; }
 
-        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        private readonly List<OrderItem> _orderItems = new();
+        public IReadOnlyCollection<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
 
         public void ChangeStatus(Status newStatus)
@@ -28,9 +36,32 @@
 
             OrderStatus = newStatus;
         }
+
+        public static Order Create(int userId)
+        {
+            return new Order
+            {
+                UserId = userId,
+                OrderDate = DateTime.UtcNow,
+                OrderStatus = Status.Ordered
+            };
+        }
+
+        public void AddItem(int productId, int quantity, decimal unitPrice)
+        {
+            var item = new OrderItem(productId, quantity, unitPrice);
+            _orderItems.Add(item);
+
+            RecalculateTotal();
+        }
+
+        private void RecalculateTotal()
+        {
+            Total = _orderItems.Sum(i => i.TotalPrice);
+        }
     }
 
-    public enum Status { Ordered = 1, Preparing = 2, Sent = 3 }
+    public enum Status { Ordered = 1, Preparing = 2, Paid = 3, Sent = 4, Cancelled = 5 }
 
 
 }
