@@ -9,5 +9,6 @@ namespace ECommerceService.Api.Dto
         public Status OrderStatus { get; set; }
         public decimal Total { get; set; }
         public List<GetOrderItemDto> Items { get; set; } = new();
+        public int UserId { get; set; }
     }
 }

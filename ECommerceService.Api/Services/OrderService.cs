@@ -1,6 +1,8 @@
-﻿using ECommerceService.Api.Dto;
+﻿using AutoMapper;
+using ECommerceService.Api.Dto;
 using ECommerceService.Api.Models;
 using ECommerceService.Api.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceService.Api.Services
 {
@@ -8,11 +10,13 @@ namespace ECommerceService.Api.Services
     {
         private readonly IOrderRepository _repo;
         private readonly IProductService _productService;
+        private readonly IMapper _mapper;
 
-        public OrderService(IOrderRepository repo, IProductService srv)
+        public OrderService(IOrderRepository repo, IProductService srv, IMapper mapper)
         {
             _productService = srv;
             _repo = repo;
+            _mapper = mapper;
         }
 
         public async Task CancelOrder(int orderId)
@@ -21,11 +25,11 @@ namespace ECommerceService.Api.Services
             if (IsOrderSent) throw new BadHttpRequestException("Cannot cancel sent order");
         }
 
-        public async Task ChangeOrderStatus(UpdateOrderDto orderDto)
+        public async Task ChangeOrderStatusAsync(int id, UpdateOrderDto orderDto)
         {
-            var order = await _repo.GetByIdAsync(orderDto.Id) ?? throw new KeyNotFoundException();
+            var order = await _repo.GetByIdAsync(id) ?? throw new KeyNotFoundException();
 
-            var IsOrderSent = await CheckIfOrderIsSent(order.Id);
+            var IsOrderSent = await CheckIfOrderIsSent(id);
             if (IsOrderSent) throw new BadHttpRequestException("Cannot cancel sent order");            
 
             if (order.OrderStatus == Models.Status.Sent)
@@ -37,12 +41,12 @@ namespace ECommerceService.Api.Services
             await _repo.UpdateAsync(order);
         }
 
-        public async Task<int> CreateOrderAsync(CreateOrderDto dto, int userId)
+        public async Task<int> CreateOrderAsync(CreateOrderDto dto)
         {
             if (!dto.Items.Any())
                 throw new InvalidOperationException("Order must contain items");
 
-            var order = Order.Create(userId);
+            var order = Order.Create(dto.UserId);
 
             var prices = await _productService.GetPricesAsync(
                 dto.Items.Select(i => i.ProductId));
@@ -61,6 +65,21 @@ namespace ECommerceService.Api.Services
             return order.Id;
         }
 
+        public async Task<List<GetOrderDto>> GetAllOrdersAsync()
+        {
+            var orders = await _repo.Query().ToListAsync();
+
+            return _mapper.Map<List<GetOrderDto>>(orders);
+        }
+
+        public async Task<GetOrderDto> GetOrderById(int id)
+        {
+            var order = await _repo.GetByIdAsync(id);
+            if (order == null)
+                throw new KeyNotFoundException("Order with given id not found.");
+
+            return _mapper.Map<GetOrderDto>(order);
+        }
 
         public Task SendOrder(int orderId)
         {
