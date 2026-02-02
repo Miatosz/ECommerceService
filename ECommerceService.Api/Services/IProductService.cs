@@ -11,6 +11,7 @@ namespace ECommerceService.Api.Services
         IQueryable<GetProductDto> QueryProducts();
         Task<GetProductDto> UpdateProduct(UpdateProductDto dto);
         Task<bool> DeleteProductAsync(int id);
+        Task EnsureSufficientStockAsync(int productId, int requiredQuantity);
 
     }
 }

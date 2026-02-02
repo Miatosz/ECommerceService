@@ -18,6 +18,18 @@ namespace ECommerceService.Api.Services
             _mapper = mapper;
         }
 
+        public async Task EnsureSufficientStockAsync(int productId, int requiredQuantity)
+        {
+            var product = await _repo.GetByIdAsync(productId)
+                ?? throw new KeyNotFoundException("Product not found.");
+
+            if (product.Stock < requiredQuantity)
+            {
+                throw new InvalidOperationException($"Insufficient stock for product {productId}.");
+            }                
+        }
+
+
         public async Task<int> CreateAsync(CreateProductDto dto)
         {
             var product = _mapper.Map<Product>(dto);

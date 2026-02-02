@@ -1,4 +1,3 @@
-
 using ECommerceService.Api.Extensions;
 using ECommerceService.Api.Middlewares;
 using ECommerceService.Api.Profiles;
@@ -30,6 +29,9 @@ namespace ECommerceService.Api
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddApplicationServices();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IStockReservationService, StockReservationService>();
 
             builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 
